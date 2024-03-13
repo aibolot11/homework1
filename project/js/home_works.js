@@ -15,27 +15,72 @@ document.getElementById('gmail_button').addEventListener('click', function() {
 
 
 
-
-
-
-
-
 const parentBlock = document.querySelector('.parent_block');
 const childBlock = document.querySelector('.child_block');
 
-let position = 0;
-const speed = 1;
+let positionX = 0;
+let positionY = 0;
+const maxOffsetWidth = parentBlock.offsetWidth - childBlock.offsetWidth;
+const maxOffsetHeight = parentBlock.offsetHeight - childBlock.offsetHeight;
 
-function move() {
-    position += speed;
-    childBlock.style.left = position + 'px';
+const moveBlock = () => {
+    if (positionX < maxOffsetWidth && positionY === 0) {
+        positionX++;
+        childBlock.style.left = `${positionX}px`;
+    } else if (positionX >= maxOffsetWidth && positionY < maxOffsetHeight) {
+        positionY++;
+        childBlock.style.top = `${positionY}px`;
+    } else if (positionX > 0 && positionY === maxOffsetHeight) {
+        positionX--;
+        childBlock.style.left = `${positionX}px`;
+    } else if (positionX === 0 && positionY > 0) {
+        positionY--;
+        childBlock.style.top = `${positionY}px`;
+    }
 
-  
-    if (position >= parentBlock.clientWidth - childBlock.clientWidth) {
-        cancelAnimationFrame(requestID); 
-    } else {
-        requestAnimationFrame(move); 
+    requestAnimationFrame(moveBlock);
+};
+
+moveBlock();
+
+
+
+
+
+
+
+
+
+
+// t
+const secondsElement = document.getElementById('seconds');
+let timerInterval;
+let seconds = 0;
+let isRunning = false;
+
+function startTimer() {
+    if (!isRunning) {
+        isRunning = true;
+        timerInterval = setInterval(() => {
+            seconds++;
+            secondsElement.textContent = seconds;
+        }, 1000);
     }
 }
 
-const requestID = requestAnimationFrame(move);
+function stopTimer() {
+    if (isRunning) {
+        isRunning = false;
+        clearInterval(timerInterval);
+    }
+}
+
+function resetTimer() {
+    stopTimer();
+    seconds = 0;
+    secondsElement.textContent = seconds;
+}
+
+document.getElementById('start').addEventListener('click', startTimer);
+document.getElementById('stop').addEventListener('click', stopTimer);
+document.getElementById('reset').addEventListener('click', resetTimer);
