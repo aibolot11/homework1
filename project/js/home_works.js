@@ -7,7 +7,7 @@ document.getElementById('gmail_button').addEventListener('click', function() {
       resultSpan.textContent = 'OK';
       resultSpan.style.color = 'green';
   } else {
-      resultSpan.textContent = 'Not ok';
+      resultSpan.textContent = 'Not ok';x
       resultSpan.style.color = 'red';
   }
 });
@@ -84,3 +84,7 @@ function resetTimer() {
 document.getElementById('start').addEventListener('click', startTimer);
 document.getElementById('stop').addEventListener('click', stopTimer);
 document.getElementById('reset').addEventListener('click', resetTimer);
+
+
+
+
