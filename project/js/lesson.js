@@ -75,3 +75,102 @@ tabsParent.onclick = (event) => {
 
 hideTabContent();
 showContent();
+
+
+//с
+
+const usdInput = document.querySelector('#usd')
+const somInput = document.querySelector('#som')
+const eurInput = document.querySelector('#eur')
+
+
+
+const converter = (element, targetElement, secondTargetElement, current ) => {
+  element.oninput = () => {
+    const request = new XMLHttpRequest()
+    request.open('GET', '../data/converter.json')
+    request.setRequestHeader('Content-type', 'application/json')
+    request.send()
+
+    request.onload = () => {
+      const data = JSON.parse(request.response)
+      switch (current) {
+        case 'som':
+          targetElement.value = (element.value / data.usd).toFixed(2)
+          secondTargetElement.value = (element.value / data.eur).toFixed(2)
+          break;
+        case 'usd':
+          targetElement.value = (element.value * data.usd).toFixed(2)
+          secondTargetElement.value = (element.value * data.eur / data.usd).toFixed(2)
+          break
+        case 'eur' :
+          targetElement.value = (element.value * data.eur).toFixed(2)
+          secondTargetElement.value = (element.value * data.usd / data.eur).toFixed(2)
+        default:
+          break;
+      }
+      element.value === ''&& (targetElement.value = '')
+      if(element.value === '' || targetElement.value === '' || secondTargetElement.value === ''){
+        targetElement.value = ''
+        secondTargetElement.value = ''
+      }
+    }
+  }
+}
+
+converter(somInput, usdInput , eurInput, 'som')
+converter(usdInput, somInput , eurInput, 'usd')
+converter(eurInput , somInput, usdInput, 'eur')
+
+const btnPrev = document.querySelector('#btn-prev')
+const btnNext = document.querySelector('#btn-next')
+const cards = document.querySelector('.card')
+
+let count = 1
+const url = 'https://jsonplaceholder.typicode.com/todos/'
+const fechRequestCards = (nun) => {
+  fetch(`${url}${count}`)
+      .then(response => response.json())
+      .then(data => {
+        cards.innerHTML= `
+        <p>${data.title}</p>
+        <p style="color: ${data.completed ? "green":"red"}">${data.completed}</p>
+        <span>${data.id}</span>
+        `
+      })
+}
+fechRequestCards(count)
+btnNext.addEventListener("click", ()=>{
+  count++
+  if (count > 200){
+    count = 1
+  }
+  fechRequestCards(count)
+})
+
+
+btnPrev.onclick = () => {
+  count--
+  if (count < 1 ){
+    count = 200
+  }
+  fechRequestCards(count)
+}
+
+
+const fechRequest = () => {
+  fetch("https://jsonplaceholder.typicode.com/posts")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+      })
+}
+fechRequest()
+
+
+
+
+
+
+
+
