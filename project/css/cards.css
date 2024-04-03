@@ -1,0 +1,18 @@
+body {
+    background-color: black;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.ccg {
+    display: flex;
+    max-width: 1000px;
+    gap: 20px;
+    flex-wrap: nowrap;
+    align-content: center;
+
+}
+
+.card img {
+    width: 400px;
+}

@@ -78,95 +78,146 @@ showContent();
 
 
 //с
+const usdInput = document.querySelector('#usd');
+const somInput = document.querySelector('#som');
+const eurInput = document.querySelector('#eur');
 
-const usdInput = document.querySelector('#usd')
-const somInput = document.querySelector('#som')
-const eurInput = document.querySelector('#eur')
+const fetchData = async () => {
+  try {
+    const response = await fetch('../data/converter.json');
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
 
-
-
-const converter = (element, targetElement, secondTargetElement, current ) => {
-  element.oninput = () => {
-    const request = new XMLHttpRequest()
-    request.open('GET', '../data/converter.json')
-    request.setRequestHeader('Content-type', 'application/json')
-    request.send()
-
-    request.onload = () => {
-      const data = JSON.parse(request.response)
+const converter = async (element, targetElement, secondTargetElement, current) => {
+  element.oninput = async () => {
+    try {
+      const data = await fetchData();
       switch (current) {
         case 'som':
-          targetElement.value = (element.value / data.usd).toFixed(2)
-          secondTargetElement.value = (element.value / data.eur).toFixed(2)
+          targetElement.value = (element.value / data.usd).toFixed(2);
+          secondTargetElement.value = (element.value / data.eur).toFixed(2);
           break;
         case 'usd':
-          targetElement.value = (element.value * data.usd).toFixed(2)
-          secondTargetElement.value = (element.value * data.eur / data.usd).toFixed(2)
-          break
-        case 'eur' :
-          targetElement.value = (element.value * data.eur).toFixed(2)
-          secondTargetElement.value = (element.value * data.usd / data.eur).toFixed(2)
+          targetElement.value = (element.value * data.usd).toFixed(2);
+          secondTargetElement.value = (element.value * data.eur / data.usd).toFixed(2);
+          break;
+        case 'eur':
+          targetElement.value = (element.value * data.eur).toFixed(2);
+          secondTargetElement.value = (element.value * data.usd / data.eur).toFixed(2);
+          break;
         default:
           break;
       }
-      element.value === ''&& (targetElement.value = '')
-      if(element.value === '' || targetElement.value === '' || secondTargetElement.value === ''){
-        targetElement.value = ''
-        secondTargetElement.value = ''
+      if (element.value === '') {
+        targetElement.value = '';
       }
+      if (element.value === '' || targetElement.value === '' || secondTargetElement.value === '') {
+        targetElement.value = '';
+        secondTargetElement.value = '';
+      }
+    } catch (error) {
+      console.error('Error converting currency:', error);
     }
-  }
-}
+  };
+};
 
-converter(somInput, usdInput , eurInput, 'som')
-converter(usdInput, somInput , eurInput, 'usd')
-converter(eurInput , somInput, usdInput, 'eur')
+converter(somInput, usdInput, eurInput, 'som');
+converter(usdInput, somInput, eurInput, 'usd');
+converter(eurInput, somInput, usdInput, 'eur');
 
-const btnPrev = document.querySelector('#btn-prev')
-const btnNext = document.querySelector('#btn-next')
-const cards = document.querySelector('.card')
 
-let count = 1
-const url = 'https://jsonplaceholder.typicode.com/todos/'
-const fechRequestCards = (nun) => {
-  fetch(`${url}${count}`)
-      .then(response => response.json())
-      .then(data => {
-        cards.innerHTML= `
+
+
+const btnPrev = document.querySelector('#btn-prev');
+const btnNext = document.querySelector('#btn-next');
+const cards = document.querySelector('.card');
+
+let count = 1;
+const url = 'https://jsonplaceholder.typicode.com/todos/';
+
+const fetchRequestCards = async (num) => {
+  try {
+    const response = await fetch(`${url}${num}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    cards.innerHTML = `
         <p>${data.title}</p>
-        <p style="color: ${data.completed ? "green":"red"}">${data.completed}</p>
+        <p style="color: ${data.completed ? "green" : "red"}">${data.completed}</p>
         <span>${data.id}</span>
-        `
-      })
-}
-fechRequestCards(count)
-btnNext.addEventListener("click", ()=>{
-  count++
-  if (count > 200){
-    count = 1
+    `;
+  } catch (error) {
+    console.error('Error fetching data:', error);
   }
-  fechRequestCards(count)
-})
+};
 
+fetchRequestCards(count);
 
-btnPrev.onclick = () => {
-  count--
-  if (count < 1 ){
-    count = 200
+btnNext.addEventListener("click", async () => {
+  count++;
+  if (count > 200) {
+    count = 1;
   }
-  fechRequestCards(count)
+  await fetchRequestCards(count);
+});
+
+btnPrev.onclick = async () => {
+  count--;
+  if (count < 1) {
+    count = 200;
+  }
+  await fetchRequestCards(count);
+};
+
+const fetchRequest = async () => {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+fetchRequest();
+
+
+
+//Weather-search
+
+const searchInput = document.querySelector(".cityName")
+const city = document.querySelector(".city")
+const temp = document.querySelector(".temp")
+
+
+const apiKey = 'e417df62e04d3b1b111abeab19cea714'
+const URL = 'http://api.openweathermap.org/data/2.5/weather'
+const citySearch = () => {
+  searchInput.oninput = async (event) => {
+    try {
+      const response = await fetch(`${URL}?q=${event.target.value}&appid=${apiKey}`)
+      const  data = await response.json()
+      city.innerHTML = data.name ? data.name: 'Not found &iquest;'
+      temp.innerHTML = data.main?.temp ? Math.round(data.main?.temp - 273) + '&deg;C' : '...'
+
+
+    }catch (error){
+      console.log('error')
+    }
+
+  }
 }
-
-
-const fechRequest = () => {
-  fetch("https://jsonplaceholder.typicode.com/posts")
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-      })
-}
-fechRequest()
-
+citySearch()
 
 
 
